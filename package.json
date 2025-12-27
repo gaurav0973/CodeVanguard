@@ -2,7 +2,7 @@
   "name": "codevanguard",
   "displayName": "Code Vanguard",
   "description": "AI-powered code reviewer and fixer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "mauryaJs",
   "repository": "https://github.com/gaurav0973/CodeVanguard",
   "icon": "media/icon.png",

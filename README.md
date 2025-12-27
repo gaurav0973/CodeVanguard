@@ -11,17 +11,16 @@ AI-powered code reviewer and fixer for Visual Studio Code.
 
 ## Requirements
 
-- Visual Studio Code 1.80.0 or later
-- A Google Gemini API key (get one at [Google AI Studio](https://makersuite.google.com/app/apikey))
+- Visual Studio Code
+- A Google Gemini API key (get one at [Google AI Studio](https://aistudio.google.com/app/api-keys))
 
 ## Installation
 
-1. Install from VS Code Marketplace: Search for "Code Vanguard"
-2. Or download the .vsix file and install manually
+- Install from VS Code Marketplace: Search for "Code Vanguard"
 
 ## Setup
-
-1. Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+1. Get your Gemini API key from [Google AI Studio](https://aistudio.google.com/app/api-keys)
+-- Optional -- 
 2. In VS Code, go to Settings → Extensions → Code Vanguard
 3. Enter your API key in the "Api Key" field
 
@@ -41,8 +40,7 @@ AI-powered code reviewer and fixer for Visual Studio Code.
 
 - JavaScript
 - TypeScript
-- Python
-- And more...
+- working on more...
 
 ## Privacy
 

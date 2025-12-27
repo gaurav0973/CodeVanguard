@@ -3,7 +3,8 @@
   "displayName": "Code Vanguard",
   "description": "AI-powered code reviewer and fixer",
   "version": "1.0.0",
-  "publisher": "maurya.js",
+  "publisher": "mauryaJs",
+  "repository": "https://github.com/gaurav0973/CodeVanguard",
   "engines": {
     "vscode": "^1.80.0"
   },

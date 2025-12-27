@@ -13,7 +13,7 @@ const TOOL_FUNCTIONS = {
   writeFileContent: writeFileContent,
 };
 
-// logger 
+// logger
 function log(outputChannel, message) {
   console.log(message);
   if (outputChannel) {
@@ -37,6 +37,7 @@ async function runAgent(directoryPath, apiKey, outputChannel) {
   ];
 
   const MAX_TURNS = 10;
+  let metrics = { files: 0, issues: 0, fixed: 0, quality: 0 };
 
   for (let i = 0; i < MAX_TURNS; i++) {
     const result = await ai.models.generateContent({
@@ -48,6 +49,27 @@ async function runAgent(directoryPath, apiKey, outputChannel) {
       },
     });
 
+    // Parse metrics from every response
+    const responseText = result.text || "";
+    const metricsMatch = responseText.match(
+      /\[METRICS\]\s*Files:\s*(\d+),\s*Issues:\s*(\d+),\s*Fixed:\s*(\d+),\s*Quality:\s*(\d+)\/10/
+    );
+    if (metricsMatch) {
+      metrics = {
+        files: parseInt(metricsMatch[1]),
+        issues: parseInt(metricsMatch[2]),
+        fixed: parseInt(metricsMatch[3]),
+        quality: parseInt(metricsMatch[4]),
+      };
+
+      console.log("📊 Metrics updated:", metrics); // Debug log
+
+      // Send metrics update to webview
+      if (outputChannel.updateMetrics) {
+        outputChannel.updateMetrics(metrics);
+      }
+    }
+
     if (result.functionCalls?.length > 0) {
       for (const functionCall of result.functionCalls) {
         const { name, args } = functionCall;
@@ -55,6 +77,22 @@ async function runAgent(directoryPath, apiKey, outputChannel) {
         log(outputChannel, `📌 ${name}`);
 
         const toolResponse = await TOOL_FUNCTIONS[name](args);
+
+        // Update metrics based on tool usage
+        if (name === "listDownAllFiles") {
+          // When listing files, we can estimate the number of files
+          const fileList = toolResponse.result || [];
+          metrics.files = fileList.length;
+          if (outputChannel.updateMetrics) {
+            outputChannel.updateMetrics(metrics);
+          }
+        } else if (name === "readFileContent") {
+          // Increment files analyzed when reading content
+          metrics.files = Math.max(metrics.files, metrics.files + 1);
+          if (outputChannel.updateMetrics) {
+            outputChannel.updateMetrics(metrics);
+          }
+        }
 
         contents.push({
           role: "model",
@@ -74,9 +112,16 @@ async function runAgent(directoryPath, apiKey, outputChannel) {
         });
       }
     } else {
-      log(outputChannel, "\n" + result.text);
+      const responseText = result.text;
+
+      log(outputChannel, "\n" + responseText);
       break;
     }
+  }
+
+  // Send final metrics
+  if (outputChannel.updateMetrics) {
+    outputChannel.updateMetrics(metrics);
   }
 }
 

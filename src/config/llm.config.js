@@ -1,7 +1,8 @@
 const  { TOOLS } = require("./tools.config");
-const  { GoogleGenAI, Type } =  require("@google/genai");
+const  { GoogleGenAI } =  require("@google/genai");
 
 const  { listDownAllFiles, readFileContent, writeFileContent } = require("../tools/index");
+const { systemInstructions } = require("../constants/prompt");
 require('dotenv').config()
 
 
@@ -34,15 +35,7 @@ async function runAgent(directoryPath) {
       model: "gemini-2.5-flash",
       contents: contents,
       config: {
-        systemInstruction: `You are an expert Code Reviewer Agent.
-
-                1. Start by using "listDownAllFiles" to see the project structure.
-                2. Read files using "readFileContent".
-                3. Fix bugs, add comments, and improve code quality.
-                4. Write the fixed code back using "writeFileContent".
-                5. Once finished, provide a text summary.
-                
-                IMPORTANT: When writing files, maintain the existing code style and imports.`,
+        systemInstruction: systemInstructions(),
         tools: TOOLS
       },
     });

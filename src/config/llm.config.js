@@ -1,12 +1,11 @@
-const  { TOOLS } = require("./tools.config");
-const  { GoogleGenAI } =  require("@google/genai");
-
-const  { listDownAllFiles, readFileContent, writeFileContent } = require("../tools/index");
+const { TOOLS } = require("./tools.config");
+const { GoogleGenAI } = require("@google/genai");
+const {
+  listDownAllFiles,
+  readFileContent,
+  writeFileContent,
+} = require("../tools/index");
 const { systemInstructions } = require("../constants/prompt");
-require('dotenv').config()
-
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const TOOL_FUNCTIONS = {
   listDownAllFiles: listDownAllFiles,
@@ -14,8 +13,17 @@ const TOOL_FUNCTIONS = {
   writeFileContent: writeFileContent,
 };
 
-async function runAgent(directoryPath) {
-  console.log(`🔍 Reviewing: ${directoryPath}\n`);
+// logger 
+function log(outputChannel, message) {
+  console.log(message);
+  if (outputChannel) {
+    outputChannel.appendLine(message);
+  }
+}
+
+async function runAgent(directoryPath, apiKey, outputChannel) {
+  const ai = new GoogleGenAI({ apiKey: apiKey });
+  log(outputChannel, `🔍 Reviewing: ${directoryPath}\n`);
 
   const contents = [
     {
@@ -36,22 +44,23 @@ async function runAgent(directoryPath) {
       contents: contents,
       config: {
         systemInstruction: systemInstructions(),
-        tools: TOOLS
+        tools: TOOLS,
       },
     });
+
     if (result.functionCalls?.length > 0) {
       for (const functionCall of result.functionCalls) {
         const { name, args } = functionCall;
 
-        console.log(`📌 ${name}`);
+        log(outputChannel, `📌 ${name}`);
+
         const toolResponse = await TOOL_FUNCTIONS[name](args);
-        // Add function call to history
+
         contents.push({
           role: "model",
           parts: [{ functionCall }],
         });
 
-        // Add function response to history
         contents.push({
           role: "user",
           parts: [
@@ -65,13 +74,12 @@ async function runAgent(directoryPath) {
         });
       }
     } else {
-      console.log("\n" + result.text);
+      log(outputChannel, "\n" + result.text);
       break;
     }
   }
 }
 
-
 module.exports = {
-  runAgent
+  runAgent,
 };

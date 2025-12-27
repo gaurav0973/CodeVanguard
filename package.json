@@ -1,11 +1,55 @@
 {
   "name": "codevanguard",
+  "displayName": "Code Vanguard",
+  "description": "AI-powered code reviewer and fixer",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "script.js",
+  "publisher": "maurya.js",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:codevanguard.sidebarView"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codevanguard-sidebar",
+          "title": "Code Vanguard",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codevanguard-sidebar": [
+        {
+          "type": "webview",
+          "id": "codevanguard.sidebarView",
+          "name": "Code Vanguard Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codevanguard.startReview",
+        "title": "Code Vanguard: Start Review"
+      }
+    ],
+    "configuration": {
+      "title": "Code Vanguard",
+      "properties": {
+        "codevanguard.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Enter your Gemini API Key here."
+        }
+      }
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,5 +57,9 @@
     "@google/genai": "^1.34.0",
     "dotenv": "^17.2.3",
     "glob": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^16.x"
   }
 }
